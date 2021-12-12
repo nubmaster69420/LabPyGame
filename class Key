@@ -5,5 +5,6 @@ class Key(object):
       if a[i] == "":
         Key = True
         a[i] = "Key"
+        break
   def UseKey(self):
     Key = False
