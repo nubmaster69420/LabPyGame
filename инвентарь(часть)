@@ -56,8 +56,20 @@ class inventory:
       if x == 460:
         x = 60
         y += step
+  def draw_panel(self):
+    x = 2--
+    y = 510
+    side = 80
+    step = 100
     
-    
+    for cell in self.inventory_whole:
+      pygame.draw.rect(display, (200, 215, 227), (x, y, side, side))
+      if cell is not None:
+        display.blit(cell.image, (x + 15, y + 5))
+      
+      x += step
 #///#
+display.blit(#///#, (0, 0))
+inventory.draw_panel()
 if keys[pygame.K_TAB]:
   inventory.draw_whole()
