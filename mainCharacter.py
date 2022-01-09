@@ -117,17 +117,17 @@ if __name__ == '__main__':
     while running:
         all_sprites.update()
 
-        all_sprites.draw(screen)
-
-        hero_character.basic_sleep(screen)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
                 hero_character.move(event, clock.tick())
 
-        screen.fill((255, 255, 255))  # Updating the main screen
+        screen.fill((0, 0, 0))  # Updating the main screen
+
+        all_sprites.draw(screen)
+
+        hero_character.basic_sleep(screen)
 
         pygame.display.flip()
 
