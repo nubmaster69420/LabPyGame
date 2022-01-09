@@ -40,6 +40,8 @@ class MovingHero(pygame.sprite.Sprite):
         self.sleep_bar_length = 200
         self.sleep_ratio = self.max_sleep / self.sleep_bar_length
 
+        self.door_key = False
+
         self.v = 10  # hero's speed
 
         self.move_buttons = [
@@ -85,12 +87,9 @@ class MovingHero(pygame.sprite.Sprite):
         if self.current_sleep >= self.max_sleep:
             self.current_sleep = self.max_sleep
 
-    def basic_sleep(self):
-        pygame.draw.rect(screen, (0, 0, 255), (10, 10, self.current_sleep / self.sleep_ratio, 25))
-        pygame.draw.rect(screen, (255, 255, 255), (10, 10, self.sleep_bar_length, 25), 4)
-
-    def update(self):
-        self.basic_sleep()
+    def basic_sleep(self, scale_screen):
+        pygame.draw.rect(scale_screen, (0, 0, 255), (10, 10, self.current_sleep / self.sleep_ratio, 25))
+        pygame.draw.rect(scale_screen, (255, 255, 255), (10, 10, self.sleep_bar_length, 25), 4)
 
 
 if __name__ == '__main__':
@@ -110,10 +109,18 @@ if __name__ == '__main__':
     # All groups appearance
     all_sprites.draw(screen)
 
+    hero_character.basic_sleep(screen)
+
     running = True  # Run variable
     move_on = False  # Some vars for the future
 
     while running:
+        all_sprites.update()
+
+        all_sprites.draw(screen)
+
+        hero_character.basic_sleep(screen)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -121,9 +128,6 @@ if __name__ == '__main__':
                 hero_character.move(event, clock.tick())
 
         screen.fill((255, 255, 255))  # Updating the main screen
-
-        all_sprites.update()
-        all_sprites.draw(screen)
 
         pygame.display.flip()
 
