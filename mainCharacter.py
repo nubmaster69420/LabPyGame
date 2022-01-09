@@ -25,6 +25,7 @@ def load_image(name, colorkey=None):
 
 
 class MovingHero(pygame.sprite.Sprite):
+
     def __init__(self, *group):
         super().__init__(*group)
 
@@ -33,6 +34,11 @@ class MovingHero(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 0
         self.rect.y = 0
+
+        self.current_sleep = 100
+        self.max_sleep = 500
+        self.sleep_bar_length = 200
+        self.sleep_ratio = self.max_sleep / self.sleep_bar_length
 
         self.v = 10  # hero's speed
 
@@ -67,6 +73,25 @@ class MovingHero(pygame.sprite.Sprite):
     def change_buttons(self):
         self.move_buttons = self.move_buttons[::-1]
 
+    def get_fatigue(self, amount):
+        if self.current_sleep > 0:
+            self.current_sleep -= amount
+        if self.current_sleep <= 0:
+            self.current_sleep = 0
+
+    def get_rest(self, amount):
+        if self.current_sleep < self.max_sleep:
+            self.current_sleep += amount
+        if self.current_sleep >= self.max_sleep:
+            self.current_sleep = self.max_sleep
+
+    def basic_sleep(self):
+        pygame.draw.rect(screen, (0, 0, 255), (10, 10, self.current_sleep / self.sleep_ratio, 25))
+        pygame.draw.rect(screen, (255, 255, 255), (10, 10, self.sleep_bar_length, 25), 4)
+
+    def update(self):
+        self.basic_sleep()
+
 
 if __name__ == '__main__':
     # Initialize garbage:
@@ -97,6 +122,7 @@ if __name__ == '__main__':
 
         screen.fill((255, 255, 255))  # Updating the main screen
 
+        all_sprites.update()
         all_sprites.draw(screen)
 
         pygame.display.flip()
