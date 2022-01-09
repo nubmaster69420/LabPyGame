@@ -105,8 +105,12 @@ class MovingHero(pygame.sprite.Sprite):
     def update(self, *args):
         tick = args[0]
 
+        current_display_screen = args[1]
+
         self.rect.y += self.move_y * tick / 100
         self.rect.x += self.move_x * tick / 100
+
+        self.basic_sleep(current_display_screen)
 
 
 if __name__ == '__main__':
@@ -132,7 +136,9 @@ if __name__ == '__main__':
     move_on = False  # Some vars for the future
 
     while running:
-        all_sprites.update(clock.tick())
+        screen.fill((0, 0, 0))  # Updating the main screen
+
+        all_sprites.update(clock.tick(), screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -142,11 +148,7 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYUP:
                 hero_character.stop_moving(event, clock.tick())
 
-        screen.fill((0, 0, 0))  # Updating the main screen
-
         all_sprites.draw(screen)
-
-        hero_character.basic_sleep(screen)
 
         pygame.display.flip()
 
