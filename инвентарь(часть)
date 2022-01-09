@@ -1,0 +1,63 @@
+import pygame
+from time import sleep
+
+pygame.init()
+
+class MainIteams:
+  def __init__(self, name, image_path):
+    self.name = name
+    self.amount = 0
+    self.image = pygame.image.load(image_path)
+    
+class inventory:
+  def __init__(self):
+    self.iteams1 = {
+      "MainKey": MainIteams("MainKey", "путь")
+      "MainKey": MainIteams("MainKey", "путь")
+      "MainKey": MainIteams("MainKey", "путь")
+    }
+    
+    self.inventory_panel = [None] * 4
+    self.inventory_whole = [None] * 8
+    
+  def get_amount(self, name):
+  try:
+    return self.iteams1[name].amount
+  except KeyError:
+    return -1
+  
+  def increase(self, name):
+    try:
+      self.iteams1[name].amount += 1
+      self.update_whole()
+    except KeyError:
+      print("Error increase")
+      
+  def update_whole(self):
+    for name, iteam in self.MainIteams.iteams():
+      if iteam.amount != 0 and iteam not in self.inventory_whole:
+        try:
+          self.inventory_whole.insert(self.inventory_whole.index(None), iteam)
+          self.inventory_whole.remove(None)
+        except:
+  def draw_whole(self):
+    x = 60
+    y = 60
+    width = height = 80
+    step = 100
+    
+    pygame.draw.rect(display, (182, 195, 206), (x - 20, y - 20, 420, 220))
+    
+    for cell in self.inventory_whole:
+      pygame.draw.rect(display, (200, 215, 227), (x, y, width, height))
+      if cell is not None:
+        display.blit(cell.image, (x + 15, y + 5))
+      x += step
+      if x == 460:
+        x = 60
+        y += step
+    
+    
+#///#
+if keys[pygame.K_TAB]:
+  inventory.draw_whole()
