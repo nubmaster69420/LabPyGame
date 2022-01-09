@@ -14,7 +14,7 @@ def menu():
                 quit()
         display.blit(menu_background, (0, 0))
         start_btn.draw(270, 200, "Start game", start_game, 50)
-        quit_btn.drwa(658, 300, "Quit", quit, 50)
+        quit_btn.draw(658, 300, "Quit", quit, 50)
 
         pygame.display.update()
         clock.tick(60)
