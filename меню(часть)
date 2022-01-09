@@ -1,0 +1,27 @@
+def menu():
+  menu_background = pygame.image.load("")
+  
+  start_btn = Button(288, 70)
+  quit_btn = Button(120, 70)
+  
+  while show:
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        quit()
+    display.blit(menu_background, (0, 0))
+    start_btn.draw(270, 200, "Start game", start_game, 50)
+    quit_btn.drwa(658, 300, "Quit", quit, 50)
+    
+    pygame.display.update()
+    clock.tick(60)
+    
+def start_game():
+  #///#
+def draw():
+#///#
+  if action == quit:
+    pygame.quit()
+    quit()
+  else:
+    action()
