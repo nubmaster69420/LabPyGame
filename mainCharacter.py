@@ -35,6 +35,9 @@ class MovingHero(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
 
+        self.move_y = 0
+        self.move_x = 0
+
         self.current_sleep = 100
         self.max_sleep = 500
         self.sleep_bar_length = 200
@@ -42,7 +45,7 @@ class MovingHero(pygame.sprite.Sprite):
 
         self.door_key = False
 
-        self.v = 10  # hero's speed
+        self.v = 100  # hero's speed
 
         self.move_buttons = [
             [
@@ -59,18 +62,26 @@ class MovingHero(pygame.sprite.Sprite):
             ]
         ]
 
-    def move(self, *args):
+    def start_moving(self, *args):
         EVENT = args[0]
         # tick = args[1]  # Program's time for smoother moving
 
         if EVENT.key == self.move_buttons[0][0]:
-            self.rect.y += self.v
+            self.move_y = self.v
         elif EVENT.key == self.move_buttons[0][1]:
-            self.rect.x += self.v
+            self.move_x = self.v
         elif EVENT.key == self.move_buttons[0][2]:
-            self.rect.y -= self.v
+            self.move_y = - self.v
         elif EVENT.key == self.move_buttons[0][3]:
-            self.rect.x -= self.v
+            self.move_x = - self.v
+
+    def stop_moving(self, *args):
+        EVENT = args[0]
+
+        if EVENT.key == self.move_buttons[0][0] or EVENT.key == self.move_buttons[0][2]:
+            self.move_y = 0
+        elif EVENT.key == self.move_buttons[0][1] or EVENT.key == self.move_buttons[0][3]:
+            self.move_x = 0
 
     def change_buttons(self):
         self.move_buttons = self.move_buttons[::-1]
@@ -90,6 +101,12 @@ class MovingHero(pygame.sprite.Sprite):
     def basic_sleep(self, scale_screen):
         pygame.draw.rect(scale_screen, (0, 0, 255), (10, 10, self.current_sleep / self.sleep_ratio, 25))
         pygame.draw.rect(scale_screen, (255, 255, 255), (10, 10, self.sleep_bar_length, 25), 4)
+
+    def update(self, *args):
+        tick = args[0]
+
+        self.rect.y += self.move_y * tick / 100
+        self.rect.x += self.move_x * tick / 100
 
 
 if __name__ == '__main__':
@@ -115,13 +132,15 @@ if __name__ == '__main__':
     move_on = False  # Some vars for the future
 
     while running:
-        all_sprites.update()
+        all_sprites.update(clock.tick())
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                hero_character.move(event, clock.tick())
+                hero_character.start_moving(event, clock.tick())
+            elif event.type == pygame.KEYUP:
+                hero_character.stop_moving(event, clock.tick())
 
         screen.fill((0, 0, 0))  # Updating the main screen
 
