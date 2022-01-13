@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
             transition_color = (0, 255, 0)
         if self.current_eat > self.target_eat:
             self.current_eat -= self.eat_change_speed
-            transition_width = int((self.target_eat - self.current_eat) / self.eat_ratio)
+            transition_width = int((self.current_eat - self.target_eat) / self.eat_ratio)
             transition_color = (255, 255, 0)
 
         eat_bar_rect = pygame.Rect(10, 45, self.current_eat / self.eat_ratio, 25)
