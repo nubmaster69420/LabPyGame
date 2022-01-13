@@ -1,56 +1,74 @@
 import pygame
-
-self.current_sleep = 100
-self.target_sleep = 250
-self.max_sleep = 500
-self.sleep_bar_length = 200
-self.sleep_ratio = self.max_sleep / self.self.sleep_bar_length
-self.sleep_chnge_speed = 5
+import sys
 
 
-def update(self):
-    # self.basic_sleep()
-    self.pro_sleep()
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((40, 40))
+        self.image.fill((240, 240, 240))
+        self.rect = self.image.get_rect(center=(400, 400))
+        self.current_sleep = 200
+        self.target_sleep = 500
+        self.maximum_sleep = 1000
+        self.sleep_bar_length = 400
+        self.sleep_ratio = self.maximum_sleep / self.sleep_bar_length
+        self.sleep_change_speed = 5
+
+    def update(self):
+        self.pro_sleep()
+
+    def get_fatigue(self, amount):
+        if self.target_sleep > 0:
+            self.target_sleep -= amount
+        if self.target_sleep <= 0:
+            self.target_sleep = 0
+
+    def get_rest(self, amount):
+        if self.target_sleep < self.maximum_sleep:
+            self.target_sleep += amount
+        if self.target_sleep >= self.maximum_sleep:
+            self.target_sleep = self.maximum_sleep
+
+    def pro_sleep(self):
+        transition_width = 0
+        transition_color = (255, 0, 0)
+
+        if self.current_sleep < self.target_sleep:
+            self.current_sleep += self.sleep_change_speed
+            transition_width = int((self.target_sleep - self.current_sleep) / self.sleep_ratio)
+            transition_color = (0, 255, 0)
+        if self.current_sleep > self.target_sleep:
+            self.current_sleep -= self.sleep_change_speed
+            transition_width = int((self.target_sleep - self.current_sleep) / self.sleep_ratio)
+            transition_color = (255, 255, 0)
+
+        sleep_bar_rect = pygame.Rect(10, 45, self.current_sleep / self.sleep_ratio, 25)
+        transition_bar_rect = pygame.Rect(sleep_bar_rect.right, 45, transition_width, 25)
+
+        pygame.draw.rect(screen, (255, 0, 0), sleep_bar_rect)
+        pygame.draw.rect(screen, transition_color, transition_bar_rect)
+        pygame.draw.rect(screen, (255, 255, 255), (10, 45, self.sleep_bar_length, 25), 4)
 
 
-def get_fatigue(self, amount):
-    if self.target_sleep > 0:
-        self.self.target_sleep -= amount
+pygame.init()
+screen = pygame.display.set_mode((800, 800))
+clock = pygame.time.Clock()
+player = pygame.sprite.GroupSingle(Player())
 
-    if self.target_sleep <= 0:
-        self.self.target_sleep = 0
-
-
-def get_rest(self, amount):
-    if self.target_sleep < self.max_sleep:
-        self.self.target_sleep += amount
-
-    if self.target_sleep >= self.max_sleep:
-        self.self.target_sleep = self.max_sleep
-
-
-# def basic_sleep(self):
-# pygame.draw.rect(screen, (0, 0, 255), (10,10,self.target_sleep / self.sleep_ratio, 25))
-# pygame.draw.rect(screen, (255,255,255), (10,10, self.sleep_bar_lenght, 25), 4)
-
-def pro_sleep(self):
-    transition_width = 0
-    transition_color = (0, 0, 255)
-
-    if self.current_sleep < self.target_sleep:
-        self.current_sleep += self.sleep_change_speed
-        transition_width = int((self.target_sleep - self.current_sleep) / self.sleep_ratio)
-        transition_color = (0, 255, 0)
-
-    if self.current_sleep > self.target_sleep:
-        self.current_sleep -= self.sleep_change_speed
-        transition_width = int((self.target_sleep - self.current_sleep) / self.sleep_ratio)
-        transition_color = (255, 255, 0)
-
-    sleep_bar_rect = pygame.Rect(10, 45, self.current_sleep / self.sleep_ratio, 25)
-    transition_bar_rect = pygame.Rect(sleep_bar_rect.right, 45, transition_width, 25)
-
-    pygame.draw.rect(screen, (0, 0, 255), sleep_bar_rect)
-    pygame.draw.rect(screen, transition_color, transition_bar_rect)
-    pygame.draw.rect(screen, (255, 255, 255), (10, 10, self.sleep_bar_lenght, 25), 4)
-    
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+            # noinspection PyUnreachableCode
+            pygame.quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                player.sprite.get_rest(200)
+            if event.key == pygame.K_DOWN:
+                player.sprite.get_fatigue(200)
+    screen.fill((30, 30, 30))
+    player.draw(screen)
+    player.update()
+    pygame.display.update()
+    clock.tick(60)
