@@ -38,14 +38,23 @@ class MovingHero(pygame.sprite.Sprite):
         self.move_y = 0
         self.move_x = 0
 
-        self.current_sleep = 100
+        self.current_eat = 100
+        self.target_eat = 150
+        self.max_eat = 200
+        self.eat_bar_length = 200
+        self.eat_ratio = self.max_eat / self.eat_bar_length
+        self.eat_change_speed = 2.5
+
+        self.current_sleep = 10
+        self.target_sleep = 500
         self.max_sleep = 500
         self.sleep_bar_length = 200
         self.sleep_ratio = self.max_sleep / self.sleep_bar_length
+        self.sleep_change_speed = 1
 
         self.door_key = False
 
-        self.v = 100  # hero's speed
+        self.v = 10  # hero's speed
 
         self.move_buttons = [
             [
@@ -86,31 +95,90 @@ class MovingHero(pygame.sprite.Sprite):
     def change_buttons(self):
         self.move_buttons = self.move_buttons[::-1]
 
+    # Bogachev's method
     def get_fatigue(self, amount):
         if self.current_sleep > 0:
             self.current_sleep -= amount
         if self.current_sleep <= 0:
             self.current_sleep = 0
 
+    # Bogachev's method
     def get_rest(self, amount):
         if self.current_sleep < self.max_sleep:
             self.current_sleep += amount
         if self.current_sleep >= self.max_sleep:
             self.current_sleep = self.max_sleep
 
+    # Bogachev's method
     def basic_sleep(self, scale_screen):
-        pygame.draw.rect(scale_screen, (0, 0, 255), (10, 10, self.current_sleep / self.sleep_ratio, 25))
-        pygame.draw.rect(scale_screen, (255, 255, 255), (10, 10, self.sleep_bar_length, 25), 4)
+        transition_width = 0
+        transition_color = (0, 0, 255)
+
+        if self.current_sleep < self.target_sleep:
+            self.current_sleep += self.sleep_change_speed
+            transition_width = int((self.target_sleep - self.current_sleep) / self.sleep_ratio)
+            transition_color = (0, 255, 0)
+
+        if self.current_sleep > self.target_sleep:
+            self.current_sleep -= self.sleep_change_speed
+            transition_width = int((self.target_sleep - self.current_sleep) / self.sleep_ratio)
+            transition_color = (255, 255, 0)
+
+        sleep_bar_rect = pygame.Rect(10, 10, self.current_sleep / self.sleep_ratio, 25)
+        transition_bar_rect = pygame.Rect(sleep_bar_rect.right, 10, transition_width, 25)
+
+        pygame.draw.rect(screen, (0, 0, 255), sleep_bar_rect)
+        pygame.draw.rect(screen, transition_color, transition_bar_rect)
+        pygame.draw.rect(screen, (255, 255, 255), (10, 10, self.sleep_bar_length, 25), 4)
+
+    # Bogachev's method
+    def pro_eat(self, curr_scrn):
+        transition_width = 0
+        transition_color = (150, 75, 0)
+
+        if self.current_eat < self.target_eat:
+            self.current_eat += self.eat_change_speed
+            transition_width = int((self.target_eat - self.current_eat) / self.eat_ratio)
+            transition_color = (173, 135, 98)
+
+        if self.current_eat > self.target_eat:
+            self.current_eat -= self.eat_change_speed
+            transition_width = int((self.target_eat - self.current_eat) / self.eat_ratio)
+            transition_color = (101, 67, 33)
+
+        eat_bar_rect = pygame.Rect(10, 45, self.current_eat / self.eat_ratio, 25)
+        transition_bar_rect = pygame.Rect(eat_bar_rect.right, 45, transition_width, 25)
+
+        pygame.draw.rect(curr_scrn, (150, 75, 0), eat_bar_rect)
+        pygame.draw.rect(curr_scrn, transition_color, transition_bar_rect)
+        pygame.draw.rect(curr_scrn, (255, 255, 255), (10, 45, self.eat_bar_length, 25), 4)
+
+    def get_starve(self, amount):
+        if self.target_eat > 0:
+            self.self.target_eat -= amount
+
+        if self.target_eat <= 0:
+            self.self.target_eat = 0
+
+    def get_food(self, amount):
+        if self.target_eat < self.max_eat:
+            self.self.target_eat += amount
+
+        if self.target_eat >= self.max_eat:
+            self.self.target_eat = self.max_eat
 
     def update(self, *args):
         tick = args[0]
 
         current_display_screen = args[1]
 
-        self.rect.y += self.move_y * tick / 100
-        self.rect.x += self.move_x * tick / 100
+        self.rect.y += self.move_y
+        self.rect.x += self.move_x
 
         self.basic_sleep(current_display_screen)
+        self.pro_eat(screen)
+
+        self.get_fatigue(1)
 
 
 if __name__ == '__main__':
@@ -131,9 +199,11 @@ if __name__ == '__main__':
     all_sprites.draw(screen)
 
     hero_character.basic_sleep(screen)
+    hero_character.pro_eat(screen)
 
     running = True  # Run variable
     move_on = False  # Some vars for the future
+
 
     while running:
         screen.fill((0, 0, 0))  # Updating the main screen
@@ -144,12 +214,16 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                hero_character.start_moving(event, clock.tick())
+                if event.key == pygame.K_TAB:
+                    hero_character.get_rest(50)
+                else:
+                    hero_character.start_moving(event, clock.tick())
             elif event.type == pygame.KEYUP:
                 hero_character.stop_moving(event, clock.tick())
 
         all_sprites.draw(screen)
 
+        clock.tick()
         pygame.display.flip()
 
     pygame.quit()
